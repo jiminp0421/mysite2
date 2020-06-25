@@ -26,6 +26,8 @@ public class MainController extends HttpServlet {
 		   </ul> 이렇게 해줬어!*/ 
 		/*회원가입을 눌러주면 저장시켜줄거야 회원가입을 성공하면 joinOk화면을 보여줘야해
 		 * (14)joinform켜주고 userController로 가!*/
+		
+		//WebUtil.forword(request, response, "/WEB-INF/views/main/index.jsp");가 바뀌어야해 index.jsp로가자! 로그인에 성공하면 이 화면 로그아웃이면 이 화면으로 가야해(29)
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

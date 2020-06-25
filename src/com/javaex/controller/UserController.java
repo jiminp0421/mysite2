@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.javaex.dao.UserDao;
 import com.javaex.util.WebUtil;
@@ -48,10 +49,48 @@ public class UserController extends HttpServlet {
 		}else if("loginForm".equals(action)) { //로그인폼!
 			System.out.println("loginForm");
 			
-			WebUtil.forword(request, response, "/WEB-INF/views/user/loginForm.jsp"); //로그인폼 뜨게하기 <li><a href="/mysite2/user?action=loginForm">로그인</a></li> index.jsp에 꼬옥 넣어주기
-
+			WebUtil.forword(request, response, "/WEB-INF/views/user/loginForm.jsp"); //로그인폼 뜨게하기 <li><a href="/mysite2/user?action=login">로그인</a></li> index.jsp에 꼬옥 넣어주기
+				
+		}else if("login".equals(action)) { ////(20)loginForm <input type="text" name="action" value = "login">을 주자 name=id, pw 주자!
+			System.out.println("login");
 			
-		}
+			String id = request.getParameter("id"); //(21) 파라미터 꼭 주자~! loginForm애 name pw에다 담자~~ 원래는 UserVo생성자를 만들어야하지만 ! 생성자 안만들면 set으로 하면돼!! 그냥 생성자 안만들고가보기
+			String password = request.getParameter("password");
+			
+			UserDao userDao = new UserDao();
+			UserVo authVo = userDao.getUser(id, password); //생성자 안만들고 이렇게 해보고 싶어 로그인 사용자를 알고싶다 UserDao로가자 (22)
+		
+			//System.out.println(authVo.toString()); //(24)hi하고 1234의 정보를 넣은 사람이 올거야!
+			//아래 "로그인실패" 에 오류주석이 뜨는 이유는 값이 null인데 toString하라고 해서 그런거니까 실험해보고 닫아!
+			
+			
+			if(authVo == null) {
+				System.out.println("로그인실패");
+				WebUtil.redirect(request, response, "/mysite2/user?action=loginForm&result=fail"); //(33) result=fail을 써준 이유는 로그인 실패한앤지 여부를 알기위해서 loginForm으로가자(34)
+			}else {
+			
+			//로그인 성공일때
+			//세션영역에 값을 추가 (27)
+				HttpSession session = request.getSession();
+				session.setAttribute("authUser", authVo); //꺼내야하니까 ""에는 별명 넣어주기 authVo에는 no,name이있어! db select no name말하는거야 메인 컨트롤러로 가자(28)
+			
+			
+			
+				WebUtil.redirect(request, response, "/mysite2/main"); //(25)메인을 다시 불러오는거니까 메인 사이트는 이미 만들어져있지? 내부에서 불러오는 거니까 리다이렉트! 지금은 로그인이 되든 안되든 메인이 뜰거야 (26)동영상!
+			}
+			//tomcat이 얘가 ok요청을 받았던앤지 몰라 로그인 후에는 정보를 계속 갖고있어야하고 로그인이 되어있다고 화면에 떠야해 그래서 세션을 써야해(27)
+		
+		}else if("logout".equals(action)) { //로그아웃일때(36)
+				HttpSession session = request.getSession();
+				session.removeAttribute("authUser");
+				session.invalidate(); //로그인한 정보가 사라졌을거야 
+				
+				WebUtil.redirect(request, response, "/mysite2/main"); //index.jsp로 돌아가서 <li><a href="/mysite2/user?action=logout">로그아웃</a></li> 써주자
+				
+				
+			}
+			
+		
 		
 	}
 

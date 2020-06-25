@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import com.javaex.vo.UserVo;
 
 public class UserDao {
-	
+
 	// 0. import java.sql.*;
 	private Connection conn = null;
 	private PreparedStatement pstmt = null;
@@ -19,8 +19,7 @@ public class UserDao {
 	private String url = "jdbc:oracle:thin:@localhost:1521:xe";
 	private String id = "webdb";
 	private String pw = "webdb";
-	
-	
+
 	private void getConnection() {
 		try {
 			// 1. JDBC 드라이버 (Oracle) 로딩
@@ -36,7 +35,7 @@ public class UserDao {
 			System.out.println("error:" + e);
 		}
 	}
-	
+
 	private void close() {
 		// 5. 자원정리
 		try {
@@ -53,44 +52,72 @@ public class UserDao {
 			System.out.println("error:" + e);
 		}
 	}
-	
-	//회원추가
-	public int insert(UserVo vo) { //DB insert에서 가져오는거야! (1)
-		
+
+	// 회원추가
+	public int insert(UserVo vo) { // DB insert에서 가져오는거야! (1)
+
 		int count = 0;
 		getConnection();
-		
+
 		try {
-			//3, sql문 준비 / 바인딩/ 실행
-			String query = ""; //쿼리문 문자열 만들기, ? 주의
+			// 3, sql문 준비 / 바인딩/ 실행
+			String query = ""; // 쿼리문 문자열 만들기, ? 주의
 			query += " insert into users";
-			query +=" values(seq_users_no.nextval, ?, ?, ?, ? )";
-			
-			pstmt = conn.prepareStatement(query); //쿼리로 만들기
-			
-			pstmt.setString(1, vo.getId()); //첫번째 ?
+			query += " values(seq_users_no.nextval, ?, ?, ?, ? )";
+
+			pstmt = conn.prepareStatement(query); // 쿼리로 만들기
+
+			pstmt.setString(1, vo.getId()); // 첫번째 ?
 			pstmt.setString(2, vo.getPassword());
 			pstmt.setString(3, vo.getName());
 			pstmt.setString(4, vo.getGender());
-			
+
 			count = pstmt.executeUpdate();
-			
+
 		} catch (SQLException e) {
 			System.out.println("error:" + e);
 		}
-		
+
 		close();
 		return count;
 		
+		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-}
 
+	// 로그인한 사용자 가져오기(22) (23)db에 select를 만들자! id pw가 where 정보에 똑같은 사람을 갖고오는거야
+	public UserVo getUser(String id, String password) {
+		UserVo vo = null;
+		getConnection(); // 시작
+
+		try {
+			// 3, sql문 준비 / 바인딩/ 실행
+			String query = ""; // 쿼리문 문자열 만들기, ? 주의
+			query += " select no, name ";
+			query += " from users ";
+			query += " where id = ? ";
+			query += " and password = ? ";
+
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, id);
+			pstmt.setString(2, password);
+
+			rs = pstmt.executeQuery();
+
+			// 4 결과처리
+			while (rs.next()) {
+				int no = rs.getInt("no");
+				String name = rs.getString("name");
+
+				vo = new UserVo();
+				vo.setNo(no);
+				vo.setName(name);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("error:" + e);
+		}
+
+		return vo; // 끝
+	}
+
+}
