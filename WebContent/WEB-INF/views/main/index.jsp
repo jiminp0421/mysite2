@@ -2,13 +2,10 @@
 <%@ page import="com.javaex.vo.UserVo" %>
 
 <%
-	
 	UserVo authUser = (UserVo)session.getAttribute("authUser"); //(30)임포트도 해줘! 그래도 오류가 뜰거야 (31)(UserVo)를 넣어주자
 	//메인화면에 로그인 하면 로그인 한사람의 이름이 뜨게하고싶어!(32) 황일영님 안녕하세요로 가봐 authUser.getName()를 넣어줬어 지금은 님 안녕하세요^^야
 	//userController로 로그인 실패로가자(33)
 %>
-
-
 
 
 <!DOCTYPE html>
